@@ -1,0 +1,25 @@
+WEBVTT
+
+00:00.000 --> 00:04.000
+The MLLM receives multiple views of one room.
+
+00:04.000 --> 00:09.000
+Image patches become image tokens, grouped by view.
+
+00:09.000 --> 00:12.000
+Gaussian summary tokens are introduced after the image tokens and before the question.
+
+00:12.000 --> 00:22.500
+Colours illustrate shared scene features. Summary tokens gather evidence across views.
+
+00:22.500 --> 00:30.500
+The image tokens, summary tokens and question form one sequence passing through the LLM.
+
+00:30.500 --> 00:36.500
+At layer 14, summary hidden states decode into a coarse Gaussian reconstruction of the room.
+
+00:36.500 --> 00:39.500
+The remaining LLM layers generate the answer.
+
+00:39.500 --> 00:46.000
+If the bed is behind you, what is in front of you? Sofa.

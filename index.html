@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Imagine3D-LLM learns a compact 3D scene representation inside a multimodal language model to improve spatial reasoning from multi-view images.">
+<meta name="theme-color" content="#fbfaf8">
+<title>Imagine3D-LLM · Imagine 3D scenes before answering</title>
+<link rel="stylesheet" href="page.css">
+<script src="assets/vendor/react.production.min.js"></script>
+<script src="assets/vendor/react-dom.production.min.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+</helmet>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="#main">Imagine<span>3D</span>-LLM</a>
+    <nav aria-label="Main navigation"><a href="#overview">Overview</a><a href="#method">Method</a><a href="#results">Results</a><a href="#analysis">Analysis</a><a href="#bibtex">Cite</a></nav>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <section class="hero" aria-labelledby="title">
+    <div>
+      <p class="eyebrow publication-label">arXiv · 2026</p>
+      <h1 id="title">Imagine3D-LLM</h1>
+      <p class="hero-title">Teaching MLLMs to imagine 3D scenes before answering</p>
+      <p class="lede">For 3D understanding, we teach a multimodal LLM to build a compact 3D representation inside its hidden states, making it to understand how the scene is structured in 3D before answering questions.</p>
+      <div class="actions"><a class="button primary" href="assets/imagine3d-llm.pdf" target="_blank" rel="noopener">Read the paper ↗</a><a class="button" href="https://github.com/cvlab-kaist/Imagine3D-LLM" target="_blank" rel="noopener">Code <span class="note">(Coming Soon)</span></a></div>
+    </div>
+  </section>
+  <div class="authors" aria-label="Authors and affiliations">
+    <ul class="author-list">
+      <li><a href="https://crepejung00.github.io/" target="_blank" rel="noopener">Jaewoo Jung</a><sup>1,2*</sup></li>
+      <li>Hyeonseo Yu<sup>1</sup></li>
+      <li><a href="https://hg010303.github.io/" target="_blank" rel="noopener">Honggyu An</a><sup>1</sup></li>
+      <li><a href="https://onground-korea.github.io/" target="_blank" rel="noopener">Jisang Han</a><sup>1</sup></li>
+      <li>Mungyeom Kim<sup>1</sup></li>
+      <li><a href="https://sites.google.com/view/minjeon/home?pli=1&amp;authuser=0" target="_blank" rel="noopener">Minkyeong Jeon</a><sup>1</sup></li>
+      <li><a href="https://hsshin98.github.io/" target="_blank" rel="noopener">Heeseong Shin</a><sup>1</sup></li>
+      <li><a href="https://wjun0830.github.io/" target="_blank" rel="noopener">WonJun Moon</a><sup>1</sup></li>
+      <li><a href="https://federicotombari.github.io/" target="_blank" rel="noopener">Federico Tombari</a><sup>3,4</sup></li>
+      <li><a href="https://danini.github.io/" target="_blank" rel="noopener">Daniel Barath</a><sup>2</sup></li>
+      <li><a href="https://people.inf.ethz.ch/marc.pollefeys/" target="_blank" rel="noopener">Marc Pollefeys</a><sup>2†</sup></li>
+      <li><a href="https://cvlab.kaist.ac.kr/members/faculty" target="_blank" rel="noopener">Seungryong Kim</a><sup>1†</sup></li>
+      <li><a href="https://sunghwanhong.github.io/" target="_blank" rel="noopener">Sunghwan Hong</a><sup>2,5†</sup></li>
+    </ul>
+    <p class="affiliations"><sup>1</sup> KAIST AI &nbsp; <sup>2</sup> ETH Zürich &nbsp; <sup>3</sup> Google &nbsp; <sup>4</sup> TUM &nbsp; <sup>5</sup> ETH AI Center</p>
+    <p class="author-notes">* Work done as a visiting researcher at ETH Zürich. &nbsp; † Co-corresponding authors.</p>
+  </div>
+
+  <section class="section" id="overview" aria-labelledby="overview-title">
+    <div class="section-head"><h2 class="eyebrow overview-label" id="overview-title">Overview</h2></div>
+    <div class="video-shell"><video id="overview-video" controls="{{ true }}" sc-camel-plays-inline="{{ true }}" preload="metadata" poster="assets/overview-poster.webp" aria-label="Animation of multi-view images becoming tokens, a Gaussian scene representation and an answer"><source src="assets/overview.mp4" type="video/mp4"><track kind="descriptions" src="assets/overview.vtt" sc-camel-src-lang="en" label="English descriptions">Your browser does not support embedded video. <a href="assets/overview.mp4">Download the overview.</a></video></div>
+  </section>
+
+  <section class="section" id="motivation" aria-labelledby="motivation-title">
+    <div class="section-head"><div><p class="eyebrow">Motivation</p><h2 id="motivation-title">Humans are surprisingly good at understanding multi-view images.</h2></div></div>
+    <div class="motivation-layout">
+      <div class="motivation-copy"><p>To answer 3D questions from multi-view images, we need to understand how the views fit together into a single scene.</p><p>Cognitive studies suggest that people mentally assemble a <em class="blue-emphasis">coarse layout</em> of the scene, using relationships between objects and information across viewpoints to understand space. Inspired by this, we explore whether MLLMs can also build a <em class="blue-emphasis">coarse layout</em> of the scene: identify recurring objects, infer how they relate, and assemble the scene without reproducing every visual detail. We ask whether building such a coarse layout helps them understand multi-view images.</p></div>
+      <figure class="motivation-figure"><video id="motivation-video" controls="{{ true }}" muted="{{ true }}" sc-camel-plays-inline="{{ true }}" preload="none" poster="assets/motivation-v2-poster.webp" width="1448" height="1086" aria-label="Four room views appear one by one, followed by a person imagining the combined 3D scene"><source src="assets/motivation-v2.mp4" type="video/mp4">Four views of the same room appear in sequence, then a person imagines how they fit together as a 3D scene.</video></figure>
+    </div>
+  </section>
+
+
+  <section class="section" id="method" aria-labelledby="method-title">
+    <div class="section-head"><div><p class="eyebrow">The idea in motion</p><h2 id="method-title">How can we equip MLLMs to also <em class="blue-emphasis">coarsely</em> imagine scenes before answering?</h2><p class="method-subtitle">Make <em class="blue-emphasis">coarse</em> reconstruction part of reasoning.</p></div></div>
+    <div class="method-steps" role="group" aria-label="Build the architecture, one step at a time">
+      <button class="step" type="button" aria-pressed="{{ summarySelected }}" aria-controls="architecture-diagram" onclick="{{ onSummary }}"><span class="step-number">01</span><span class="step-title">Summarize the views</span><span class="step-description">Add Gaussian summary tokens between the image and question tokens.</span></button>
+      <button class="step" type="button" aria-pressed="{{ decodingSelected }}" aria-controls="architecture-diagram" onclick="{{ onDecoding }}"><span class="step-number">02</span><span class="step-title">Imagine the scene</span><span class="step-description">Decode a 3D scene and learn with language and reconstruction losses.</span></button>
+      <button class="step" type="button" aria-pressed="{{ teacherSelected }}" aria-controls="architecture-diagram" onclick="{{ onTeacher }}"><span class="step-number">03</span><span class="step-title">Accelerate training with a teacher</span><span class="step-description">Distill a compact Gaussian teacher into the model during training.</span></button>
+    </div>
+    <figure class="architecture-panel" id="architecture-diagram">
+      <div class="architecture-figure">
+        <div class="architecture-canvas arch-step-{{ archStep }}" role="img" aria-label="{{ archDescription }}">
+          <img class="arch-layer arch-summary" src="assets/architecture-stages/stage1.png" width="3772" height="1627" alt="" aria-hidden="true">
+          <img class="arch-layer arch-decoding" src="assets/architecture-stages/stage2.png" width="3318" height="1417" alt="" aria-hidden="true">
+          <img class="arch-layer arch-teacher" src="assets/architecture-stages/stage3.png" width="3308" height="1417" alt="" aria-hidden="true">
+        </div>
+      </div>
+      <figcaption><div class="architecture-caption" role="status" aria-live="polite" aria-atomic="true"><strong>{{ archTitle }}</strong><p>{{ archDescription }}</p></div></figcaption>
+    </figure>
+    <p class="inference-note"><span><strong>At inference:</strong> the teacher is removed. The Gaussian decoder is optional for answering; it is only needed to produce a reconstruction.</span></p>
+    <details class="details"><summary>Explore the token budget and decoding layer</summary><div class="details-body"><div class="explorers">
+      <div class="explorer"><label for="tokens">Gaussian summary tokens <output for="tokens">{{ mLabel }}</output></label><input id="tokens" type="range" min="0" max="2" step="1" value="{{ mIndex }}" aria-valuetext="{{ mLabel }} summary tokens" onchange="{{ onM }}"><div class="range-ends"><span>1,296</span><span>2,592</span><span>5,184</span></div><div class="score-pair"><span><strong>{{ mSqa }}</strong> SQA3D</span><span><strong>{{ mSpar }}</strong> SPAR</span></div><p>{{ mNote }}</p></div>
+      <div class="explorer"><label for="layer">Decoding layer <output for="layer">{{ lLabel }} / 28</output></label><input id="layer" type="range" min="0" max="2" step="1" value="{{ layerIndex }}" aria-valuetext="Layer {{ lLabel }} of 28" onchange="{{ onLayer }}"><div class="range-ends"><span>Layer 7</span><span>Layer 14</span><span>Layer 21</span></div><div class="score-pair"><span><strong>{{ lSqa }}</strong> SQA3D</span><span><strong>{{ lSpar }}</strong> SPAR</span></div><p>{{ lNote }}</p></div>
+    </div><p class="note chart-note">Paper ablations: SQA3D exact match and SPAR overall accuracy (%). The default uses 32 views, 6,720 image tokens and 2,592 summary tokens; each summary token decodes to 32 Gaussians.</p></div></details>
+  </section>
+
+  <section class="section" id="results" aria-labelledby="results-title">
+    <div class="section-head"><div><p class="eyebrow">Results</p><h2 id="results-title">Better spatial reasoning.</h2><p class="section-intro">A compact scene representation improves spatial question answering, with gains that persist in controlled comparisons.</p></div></div>
+    <div class="metrics">
+      <article class="metric"><h3 class="metric-label">SPAR · overall accuracy</h3><p class="metric-number">68.5<span>%</span></p><p class="metric-comparison"><strong>+5.2 points</strong> over 3DThinker, the strongest prior result listed.</p></article>
+      <article class="metric"><h3 class="metric-label">SQA3D · exact match</h3><p class="metric-number">63.8<span>%</span></p><p class="metric-comparison"><strong>+7.3 points</strong> over our matched baseline (56.5%).</p></article>
+      <article class="metric"><h3 class="metric-label">Real-3DQA · exact match</h3><p class="metric-number">39.2<span>%</span></p><p class="metric-comparison"><strong>+2.6 points</strong> over Ross3D (36.6%).</p></article>
+    </div>
+    <details class="details"><summary>Compare SPAR results</summary><div class="details-body"><div class="chart-head"><h3>Spatial reasoning across models</h3><p class="chart-metric">Overall accuracy (%)</p></div><div class="bars" aria-live="polite"><sc-for list="{{ bars }}" as="row"><div class="bar-row"><span class="bar-label" style="color: {{ row.nameColor }}">{{ row.name }}</span><div class="bar-track" aria-hidden="true"><div class="bar-fill" style="width: {{ row.width }}; background: {{ row.color }};"></div></div><span class="bar-value">{{ row.value }}</span></div></sc-for></div><p class="note chart-note">Accuracy (%), on a shared 0–100 scale. “—” means not reported. Models differ in size and training; these are benchmark comparisons, not controlled ablations.</p></div></details>
+    <details class="details"><summary>View full benchmark tables</summary><div class="details-body"><p>All metrics below are higher-is-better. Tables scroll horizontally on small screens.</p><h3 class="subsection">3D question answering</h3><div class="table-region" role="region" aria-label="3D question answering benchmark table; scroll horizontally" sc-camel-tab-index="0"><table class="benchmark-table qa-table">
+            <thead><tr><th scope="col">Benchmark</th><th sc-camel-col-span="2" scope="colgroup">SQA3D</th><th sc-camel-col-span="2" scope="colgroup">Real-3DQA</th><th sc-camel-col-span="5" scope="colgroup">ScanQA</th></tr>
+              <tr>
+                <th>Method</th>
+                <th>EM</th>
+                <th>EM-R</th>
+                <th>EM</th>
+                <th>EM-R</th>
+                <th>CIDEr</th>
+                <th>B-4</th>
+                <th>METEOR</th>
+                <th>ROUGE</th>
+                <th>EM</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td sc-camel-col-span="10">Specialists</td></tr>
+              <tr><td>SQA3D</td><td>46.6</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td></tr>
+              <tr><td>ScanQA</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>64.9</td><td>10.1</td><td>13.1</td><td>33.3</td><td>21.1</td></tr>
+              <tr><td sc-camel-col-span="10">2D LMMs</td></tr>
+              <tr><td>InternVL2-8B</td><td>33.0</td><td>45.3</td><td>&ndash;</td><td>&ndash;</td><td>62.5</td><td>3.3</td><td>14.5</td><td>34.3</td><td>&ndash;</td></tr>
+              <tr><td>Qwen2-VL-7B</td><td>40.7</td><td>46.7</td><td>&ndash;</td><td>&ndash;</td><td>53.9</td><td>3.0</td><td>11.4</td><td>29.3</td><td>&ndash;</td></tr>
+              <tr><td>LLaVA-Video-7B</td><td>48.5</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>88.7</td><td>3.1</td><td>17.7</td><td>44.6</td><td>&ndash;</td></tr>
+              <tr><td sc-camel-col-span="10">3D LMMs</td></tr>
+              <tr><td>Scene-LLM</td><td>53.6</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>80.0</td><td>11.7</td><td>15.8</td><td>35.9</td><td>27.2</td></tr>
+              <tr><td>LL3DA</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>76.8</td><td>&ndash;</td><td>15.9</td><td>37.3</td><td>&ndash;</td></tr>
+              <tr><td>LEO</td><td>50.0</td><td>52.4</td><td>&ndash;</td><td>&ndash;</td><td>80.0</td><td>11.5</td><td>16.2</td><td>39.3</td><td>21.5</td></tr>
+              <tr><td>ChatScene</td><td>54.6</td><td>57.5</td><td>&ndash;</td><td>&ndash;</td><td>87.7</td><td>14.3</td><td>18.0</td><td>41.6</td><td>21.6</td></tr>
+              <tr><td>Grounded 3D-LLM</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>72.7</td><td>13.4</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td></tr>
+              <tr><td>LLaVA-3D</td><td>55.6</td><td>57.6</td><td>&ndash;</td><td>&ndash;</td><td>91.7</td><td>14.5</td><td>20.7</td><td>50.1</td><td>27.0</td></tr>
+              <tr><td>Video-3D-LLM</td><td>58.6</td><td>&ndash;</td><td>31.2</td><td>36.4</td><td>102.1</td><td>16.4</td><td>20.0</td><td>49.3</td><td>30.1</td></tr>
+              <tr><td>3DRS</td><td>60.6</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>104.8</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>30.3</td></tr>
+              <tr><td>Ross3D</td><td>63.0</td><td>65.7</td><td>36.6</td><td>41.5</td><td>107.0</td><td>17.9</td><td>20.9</td><td>50.7</td><td>30.8</td></tr>
+              <tr>
+                <td>Imagine3D-LLM (ours)</td>
+                <td>63.8</td><td>66.4</td>
+                <td>39.2</td><td>44.3</td>
+                <td>109.3</td><td>20.5</td><td>21.3</td><td>49.7</td><td>29.9</td>
+              </tr>
+            </tbody>
+          </table></div><h3 class="subsection">Captioning and visual grounding</h3><div class="table-region" role="region" aria-label="Captioning and grounding benchmark table; scroll horizontally" sc-camel-tab-index="0"><table class="benchmark-table caption-table">
+            <thead><tr><th scope="col">Benchmark</th><th sc-camel-col-span="4" scope="colgroup">Scan2Cap · IoU 0.5</th><th sc-camel-col-span="2" scope="colgroup">ScanRefer</th><th sc-camel-col-span="2" scope="colgroup">Multi3DRefer</th></tr>
+              <tr>
+                <th>Method</th>
+                <th>ROUGE</th>
+                <th>B-4</th>
+                <th>METEOR</th>
+                <th>CIDEr</th>
+                <th>Acc@0.25</th>
+                <th>Acc@0.5</th>
+                <th>F1@0.25</th>
+                <th>F1@0.5</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td sc-camel-col-span="9">Specialists</td></tr>
+              <tr><td>Scan2Cap</td><td>44.5</td><td>23.3</td><td>22.0</td><td>35.2</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td></tr>
+              <tr><td>3DJCG</td><td>50.8</td><td>31.0</td><td>24.2</td><td>49.5</td><td>49.6</td><td>37.3</td><td>&ndash;</td><td>26.6</td></tr>
+              <tr><td>ScanRefer</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>37.3</td><td>24.3</td><td>&ndash;</td><td>&ndash;</td></tr>
+              <tr><td>M3DRef-CLIP</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>51.9</td><td>44.7</td><td>42.8</td><td>38.4</td></tr>
+              <tr><td sc-camel-col-span="9">3D LMMs</td></tr>
+              <tr><td>LL3DA</td><td>55.1</td><td>36.8</td><td>26.0</td><td>65.2</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td></tr>
+              <tr><td>Grounded 3D-LLM</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>47.9</td><td>44.1</td><td>45.2</td><td>40.6</td></tr>
+              <tr><td>LEO</td><td>58.1</td><td>38.2</td><td>27.9</td><td>72.4</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td></tr>
+              <tr><td>ChatScene</td><td>58.1</td><td>36.3</td><td>&ndash;</td><td>77.1</td><td>55.5</td><td>50.2</td><td>57.1</td><td>52.4</td></tr>
+              <tr><td>LLaVA-3D</td><td>63.4</td><td>41.1</td><td>30.2</td><td>79.2</td><td>54.1</td><td>42.4</td><td>&ndash;</td><td>&ndash;</td></tr>
+              <tr><td>Video-3D-LLM</td><td>62.3</td><td>42.4</td><td>28.9</td><td>83.8</td><td>58.1</td><td>51.7</td><td>58.0</td><td>52.7</td></tr>
+              <tr><td>VG-LLM</td><td>62.6</td><td>41.5</td><td>28.9</td><td>80.0</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td></tr>
+              <tr><td>3DRS</td><td>&ndash;</td><td>41.6</td><td>&ndash;</td><td>86.1</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td></tr>
+              <tr><td>Ross3D</td><td>66.9</td><td>43.4</td><td>30.3</td><td>81.3</td><td>61.1</td><td>54.4</td><td>59.6</td><td>54.3</td></tr>
+              <tr>
+                <td>Imagine3D-LLM (ours)</td>
+                <td>67.6</td><td>48.3</td><td>32.6</td><td>99.2</td>
+                <td>62.8</td><td>56.3</td>
+                <td>60.2</td><td>55.0</td>
+              </tr>
+            </tbody>
+          </table></div><p class="note chart-note">EM: exact match; EM-R: refined exact match; B-4: BLEU-4. Captioning scores are reported at IoU 0.5; grounding columns indicate their IoU thresholds. SQA3D and Real-3DQA use test splits; ScanQA, Scan2Cap, ScanRefer and Multi3DRefer use validation splits. General-purpose 2D LMMs in the question-answering table are evaluated zero-shot. See the paper for method references.</p></div></details>
+    <details class="details" id="ablations"><summary>What drives the gains?</summary><div class="details-body">
+      <p class="ablation-lead">Learning to reconstruct is what improves understanding.</p>
+      <p>Every variant uses the same MLLM backbone and training data. The baseline learns to answer from images with language modeling alone. We compare four variants to isolate how 3D information contributes:</p>
+      <dl class="ablation-variants">
+        <div><dt>Teacher tokens as input</dt><dd>Feed the pretrained Gaussian teacher’s tokens directly to the LLM as extra input. Train for answering, without asking the MLLM to reconstruct.</dd></div>
+        <div><dt>Distillation only</dt><dd>Add learnable summary tokens and match their hidden states and decoded Gaussian parameters to a frozen teacher. Keep language modeling, but remove reconstruction loss.</dd></div>
+        <div><dt>Reconstruction only</dt><dd>Train summary tokens to decode a scene whose rendered views match the input images, jointly with language modeling. Use no teacher distillation.</dd></div>
+        <div><dt>Full Imagine3D-LLM</dt><dd>Combine language modeling and reconstruction with teacher distillation. The model learns to reconstruct and answer with a shorter training schedule.</dd></div>
+      </dl>
+      <div class="two-col subsection ablation-results"><div><h3>Training objectives</h3><div class="table-region small-table" role="region" aria-label="Training objective ablations" sc-camel-tab-index="0"><table>
+            <thead><tr><th>Variant</th><th>SQA3D</th><th>SPAR</th></tr></thead>
+            <tbody>
+              <tr><td>Baseline</td><td>56.5</td><td>60.9</td></tr>
+              <tr><td>+ Teacher tokens as input</td><td>56.4</td><td>60.8</td></tr>
+              <tr><td>+ Distillation only</td><td>56.6</td><td>60.5</td></tr>
+              <tr><td>+ Reconstruction (4 ep.)</td><td>63.7</td><td>67.9</td></tr>
+              <tr><td>Full (ours, 1 ep.)</td><td>63.8</td><td>68.5</td></tr>
+            </tbody>
+          </table></div><p class="note chart-note">SQA3D exact match and SPAR overall accuracy (%). All variants retain language modeling.</p></div>
+      <div><h3>Training duration</h3><figure class="training-chart" aria-label="SQA3D performance by training duration">
+        <p class="training-axis-title">SQA3D exact match (%)</p>
+        <div class="training-plot" role="img" aria-label="At epochs 1, 2 and 4, baseline scores are 56.5, 57.2 and 52.3; reconstruction-only scores are 57.7, 61.9 and 63.7. Full Imagine3D-LLM scores 63.8 at epoch 1, reaching similar accuracy in one quarter of the epochs.">
+          <svg class="training-lines" sc-camel-view-box="0 0 1000 100" sc-camel-preserve-aspect-ratio="none" aria-hidden="true">
+            <line class="training-grid" x1="0" y1="93.103448" x2="1000" y2="93.103448"></line>
+            <line class="training-grid" x1="0" y1="79.310345" x2="1000" y2="79.310345"></line>
+            <line class="training-grid" x1="0" y1="65.517241" x2="1000" y2="65.517241"></line>
+            <line class="training-grid" x1="0" y1="51.724138" x2="1000" y2="51.724138"></line>
+            <line class="training-grid" x1="0" y1="37.931034" x2="1000" y2="37.931034"></line>
+            <line class="training-grid" x1="0" y1="24.137931" x2="1000" y2="24.137931"></line>
+            <line class="training-grid" x1="0" y1="10.344828" x2="1000" y2="10.344828"></line>
+            <line class="training-axis" x1="0" y1="100" x2="1000" y2="100"></line>
+            <polyline class="training-series training-baseline" points="70.000000,62.068966 356.666667,57.241379 930.000000,91.034483"></polyline>
+            <polyline class="training-series training-reconstruction" points="70.000000,53.793103 356.666667,24.827586 930.000000,12.413793"></polyline>
+          </svg>
+          <span class="training-y-tick" style="top:93.103448%" aria-hidden="true">52</span>
+          <span class="training-y-tick" style="top:79.310345%" aria-hidden="true">54</span>
+          <span class="training-y-tick" style="top:65.517241%" aria-hidden="true">56</span>
+          <span class="training-y-tick" style="top:51.724138%" aria-hidden="true">58</span>
+          <span class="training-y-tick" style="top:37.931034%" aria-hidden="true">60</span>
+          <span class="training-y-tick" style="top:24.137931%" aria-hidden="true">62</span>
+          <span class="training-y-tick" style="top:10.344828%" aria-hidden="true">64</span>
+          <span class="training-x-tick" style="left:7.000000%" aria-hidden="true">1</span>
+          <span class="training-x-tick" style="left:35.666667%" aria-hidden="true">2</span>
+          <span class="training-x-tick" style="left:93.000000%" aria-hidden="true">4</span>
+          <span class="training-point training-baseline training-label-below" style="left:7.000000%;top:62.068966%" aria-hidden="true"><span class="training-dot"></span><span class="training-value">56.5</span></span>
+          <span class="training-point training-baseline" style="left:35.666667%;top:57.241379%" aria-hidden="true"><span class="training-dot"></span><span class="training-value">57.2</span></span>
+          <span class="training-point training-baseline" style="left:93.000000%;top:91.034483%" aria-hidden="true"><span class="training-dot"></span><span class="training-value">52.3</span></span>
+          <span class="training-point training-reconstruction" style="left:7.000000%;top:53.793103%" aria-hidden="true"><span class="training-dot"></span><span class="training-value">57.7</span></span>
+          <span class="training-point training-reconstruction" style="left:35.666667%;top:24.827586%" aria-hidden="true"><span class="training-dot"></span><span class="training-value">61.9</span></span>
+          <span class="training-point training-reconstruction" style="left:93.000000%;top:12.413793%" aria-hidden="true"><span class="training-dot"></span><span class="training-value">63.7</span></span>
+          <span class="training-point training-full" style="left:7.000000%;top:11.724138%" aria-hidden="true"><span class="training-star">★</span><span class="training-value">63.8</span></span>
+        </div>
+        <p class="training-x-title">Training epochs</p>
+        <figcaption class="training-legend"><span class="training-baseline"><i aria-hidden="true"></i>Baseline</span><span class="training-reconstruction"><i aria-hidden="true"></i>Reconstruction only</span><span class="training-full"><b aria-hidden="true">★</b>Full model · 1 epoch</span></figcaption>
+      </figure><p class="note chart-note">Similar SQA3D accuracy in one epoch instead of four. Epochs measure passes through the training data.</p></div></div>
+      <p class="ablation-takeaway">Teacher inputs or distillation alone leave performance close to the baseline. Reconstruction-only training reaches <strong>63.7 SQA3D</strong> after four epochs; the full model reaches <strong>63.8 after one</strong>. Reconstruction drives the gain, and teacher distillation accelerates learning.</p>
+    </div></details>
+  </section>
+
+  <section class="section" id="analysis" aria-labelledby="analysis-title">
+    <div class="section-head"><div><p class="eyebrow">Inside the model</p><h2 id="analysis-title">Learning to reconstruct connects the views.</h2><p class="section-intro">The reconstruction objective encourages cross-view correspondence and object-level grouping within the model’s visual features.</p></div></div>
+    <div class="two-col analysis-grid">
+      <article class="analysis-item"><h3>Gaussian summary tokens learn object-level grouping</h3><div class="analysis-copy"><p>We apply k-means to the Gaussian summary tokens after training, then render the Gaussians decoded from a selected cluster.</p><details class="analysis-details" id="analysis-details-1"><summary><span class="details-read">Read details</span><span class="details-hide">Hide details</span></summary><p>Across the input views, this cluster captures the sofa, despite receiving no object labels or clustering supervision. The visualization suggests that compact summary tokens bring recurring scene content together into an object-level representation, instead of treating each view independently.</p></details></div><figure class="figure-panel figure-zoomable"><img src="assets/object-groups-1280.webp" sc-camel-src-set="assets/object-groups-640.webp 640w, assets/object-groups-1280.webp 1280w, assets/object-groups-1920.webp 1920w" sizes="(max-width: 680px) calc(100vw - 64px), (max-width: 1248px) 44vw, 500px" width="4198" height="1125" loading="lazy" alt="Input views and Gaussians decoded from a selected k-means cluster of summary tokens, showing the same sofa across views."><button class="figure-enlarge" type="button" onclick="{{ onEnlargeObjects }}" aria-label="Enlarge object-level grouping figure" aria-haspopup="dialog"><span aria-hidden="true">⤢</span> Enlarge</button></figure></article>
+      <article class="analysis-item"><h3>Improved feature representation without direct supervision</h3><div class="analysis-copy"><p>Only the Gaussian summary tokens receive direct 3D reconstruction supervision, yet the image features improve too.</p><details class="analysis-details" id="analysis-details-2"><summary><span class="details-read">Read details</span><span class="details-hide">Hide details</span></summary><p>On the left, the red point is the query: our attention weights concentrate more sharply on the corresponding object in other views. On the right, PCA maps image features to RGB, revealing more consistent, semantically structured regions than the baseline.</p></details></div><figure class="figure-panel figure-zoomable"><img src="assets/correspondence-1280.webp" sc-camel-src-set="assets/correspondence-640.webp 640w, assets/correspondence-1280.webp 1280w, assets/correspondence-1920.webp 1920w" sizes="(max-width: 680px) calc(100vw - 64px), (max-width: 1248px) 44vw, 500px" width="4648" height="1842" loading="lazy" alt="Cross-view feature correspondences and PCA visualizations comparing the baseline and Imagine3D-LLM."><button class="figure-enlarge" type="button" onclick="{{ onEnlargeCorrespondence }}" aria-label="Enlarge cross-view correspondence figure" aria-haspopup="dialog"><span aria-hidden="true">⤢</span> Enlarge</button></figure></article>
+    </div>
+    <details class="details" id="attention-comparison"><summary>Compare image-to-image feature attention interactively</summary><div class="details-body"><div class="comparison-wrap attention-comparison"><div class="comparison-visual"><p class="note">Input views</p><div class="comparison-image comparison-input" role="img" aria-label="Four input views of the same scene"></div><div class="comparison" role="img" aria-label="Image-to-image attention comparison: baseline at left, Imagine3D-LLM at right"><div class="comparison-image baseline"></div><div class="comparison-image ours" style="clip-path: {{ wipeClip }};"></div><div class="wipe-line" style="left: {{ wipePct }};"></div></div><button class="figure-enlarge" type="button" onclick="{{ onEnlargeAttention }}" aria-label="Enlarge the full attention and PCA figure" aria-haspopup="dialog"><span aria-hidden="true">⤢</span> Enlarge</button></div><div class="compare-controls"><label for="attention-wipe"><span>Baseline</span><span>Imagine3D-LLM</span></label><input id="attention-wipe" type="range" min="0" max="100" value="{{ wipe }}" onchange="{{ onWipe }}" aria-label="Image-to-image attention comparison divider" aria-valuetext="{{ wipe }} percent baseline visible"></div><p class="note">The red point marks the query location. Drag the divider to compare attention to that query across views. Warmer colours indicate higher attention weights; sharper focus on the corresponding object indicates stronger cross-view correspondence.</p></div></div></details>
+    <details class="details" id="pca-comparison"><summary>Compare feature PCA interactively</summary><div class="details-body"><div class="comparison-wrap pca-comparison"><div class="comparison-visual"><p class="note">Input views</p><div class="comparison-image comparison-input" role="img" aria-label="Four input views of the same scene"></div><div class="comparison" role="img" aria-label="PCA feature comparison: baseline at left, Imagine3D-LLM at right"><div class="comparison-image baseline"></div><div class="comparison-image ours" style="clip-path: {{ pcaWipeClip }};"></div><div class="wipe-line" style="left: {{ pcaWipePct }};"></div></div><button class="figure-enlarge" type="button" onclick="{{ onEnlargePca }}" aria-label="Enlarge the full attention and PCA figure" aria-haspopup="dialog"><span aria-hidden="true">⤢</span> Enlarge</button></div><div class="compare-controls"><label for="pca-wipe"><span>Baseline</span><span>Imagine3D-LLM</span></label><input id="pca-wipe" type="range" min="0" max="100" value="{{ pcaWipe }}" onchange="{{ onPcaWipe }}" aria-label="PCA feature comparison divider" aria-valuetext="{{ pcaWipe }} percent baseline visible"></div><p class="note">Drag the divider to compare image-feature structure. PCA maps the first three principal components to RGB. Within each model, similar colours indicate similar feature representations, not assigned object labels.</p></div></div></details>
+    <details class="details"><summary>See Gaussian reconstruction</summary><div class="details-body"><p>The learned representation captures coarse scene geometry and object layout. It is intended to support spatial reasoning rather than photorealistic rendering.</p><figure class="figure-panel figure-zoomable subsection"><img src="assets/reconstructions-1280.webp" sc-camel-src-set="assets/reconstructions-640.webp 640w, assets/reconstructions-1280.webp 1280w, assets/reconstructions-1920.webp 1920w" sizes="(max-width: 1248px) calc(100vw - 80px), 1150px" width="3837" height="1292" loading="lazy" alt="Additional input room views and their predicted 3D Gaussian reconstructions."><button class="figure-enlarge" type="button" onclick="{{ onEnlargeReconstructions }}" aria-label="Enlarge Gaussian reconstructions" aria-haspopup="dialog"><span aria-hidden="true">⤢</span> Enlarge</button></figure></div></details>
+  </section>
+
+  <section class="section" id="bibtex" aria-labelledby="cite-title"><p class="eyebrow">Citation</p><h2 id="cite-title">Cite Imagine3D-LLM</h2><div class="citation"><pre>TBD</pre></div></section>
+  <footer>Imagine<span class="blue-emphasis">3D</span>-LLM</footer>
+</main>
+<dialog id="figure-lightbox" class="figure-lightbox" aria-labelledby="figure-lightbox-title" onclick="{{ onFigureBackdrop }}" sc-camel-on-close="{{ onFigureClosed }}">
+  <button class="lightbox-close" type="button" onclick="{{ onCloseFigure }}" aria-label="Close enlarged figure">✕</button>
+  <img class="lightbox-image" src="{{ figureSrc }}" alt="{{ figureAlt }}" onclick="{{ onCloseFigure }}">
+  <div class="lightbox-caption"><p id="figure-lightbox-title">{{ figureTitle }}</p><span class="lightbox-hint">Esc to close</span></div>
+</dialog>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { mIndex: 1, layerIndex: 1, wipe: 50, pcaWipe: 50, archStep: 3, figureSrc: "assets/object-groups-1280.webp", figureTitle: "Gaussian summary tokens learn object-level grouping", figureAlt: "Object-level grouping across views" };
+  componentDidMount() {
+    this._motivationFrame = requestAnimationFrame(() => {
+      const video = document.getElementById("motivation-video");
+      if (!video || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      if (!("IntersectionObserver" in window)) return;
+      this._motivationObserver = new IntersectionObserver(entries => {
+        if (!entries.some(entry => entry.isIntersecting)) return;
+        this._motivationObserver.disconnect();
+        // Start once on arrival; native controls allow pause and replay.
+        if (video.currentTime === 0 && video.paused) {
+          video.muted = true;
+          video.play().catch(() => {});
+        }
+      }, { threshold: 0.35 });
+      this._motivationObserver.observe(video);
+    });
+  }
+  componentWillUnmount() {
+    cancelAnimationFrame(this._motivationFrame);
+    if (this._motivationObserver) this._motivationObserver.disconnect();
+    this.restoreFigureFocus();
+  }
+  openFigure(src, title, alt) {
+    this._figureTrigger = document.activeElement;
+    this.setState({ figureSrc: src, figureTitle: title, figureAlt: alt }, () => {
+      const dialog = document.getElementById("figure-lightbox");
+      if (!dialog || dialog.open) return;
+      this._bodyOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      dialog.showModal();
+    });
+  }
+  closeFigure() {
+    const dialog = document.getElementById("figure-lightbox");
+    if (dialog && dialog.open) dialog.close();
+  }
+  restoreFigureFocus() {
+    if (this._bodyOverflow !== undefined) {
+      document.body.style.overflow = this._bodyOverflow;
+      this._bodyOverflow = undefined;
+    }
+    if (this._figureTrigger && this._figureTrigger.isConnected) this._figureTrigger.focus({ preventScroll: true });
+    this._figureTrigger = null;
+  }
+  renderVals() {
+    const ms = [
+      {label:"1,296",sqa:"61.9",spar:"64.6",note:"Too few tokens make it difficult to summarize all the visual information, leading to lower performance."},
+      {label:"2,592",sqa:"63.8",spar:"68.5",note:"A balanced token budget provides a strong information bottleneck and enough capacity for reconstruction, giving the best performance."},
+      {label:"5,184",sqa:"60.3",spar:"58.4",note:"Too many tokens weaken the bottleneck, making it harder to consolidate shared features into the same summary tokens."}
+    ];
+    const ls = [
+      {label:"7",sqa:"60.7",spar:"60.2",note:"Decoding too early leaves too few layers to summarize the visual information into the summary tokens."},
+      {label:"14",sqa:"63.8",spar:"68.5",note:"The middle layer provides enough layers to summarize the visual information and enough remaining layers to use the summary tokens for reasoning."},
+      {label:"21",sqa:"61.7",spar:"64.0",note:"Later decoding leaves fewer layers to use the reconstructed scene information."}
+    ];
+    const m=ms[this.state.mIndex],l=ls[this.state.layerIndex];
+    const data=[
+      ["Claude-3.7-Sonnet",21.8,7.3],["Qwen2-VL-7B",30.7,20.4],["LLaVA-Video-7B",32.3,24.8],
+      ["InternVL2.5-8B",36.3,31.9],["GPT-4o",36.4,24.9],["Qwen2.5-VL-72B",39.4,23.1],
+      ["VLM3R-7B",43.2,28.4],["G²VLM-SR-2B",54.9,36.3],["3DThinker-7B",63.3,null],["Imagine3D-LLM-7B",68.5,67.0]
+    ];
+    const bars=data.map((d,i)=>{const v=d[1];return {name:d[0],value:v===null?"—":v.toFixed(1),width:(v||0)+"%",color:i===9?"#3479e5":"#a7b5c9",nameColor:i===9?"#245fbf":"#59616e"};});
+    const architecture = [
+      {title:"01 · Summarize the views",description:"Learnable Gaussian summary tokens collect evidence across views, after the image tokens and before the question."},
+      {title:"02 · Imagine the scene",description:"A Gaussian head decodes the summary hidden states into a compact 3D scene. Reconstruction loss supervises the scene, while the LM loss trains the model to answer."},
+      {title:"03 · Accelerate training with a teacher",description:"A frozen compact Gaussian teacher provides token and Gaussian-parameter targets for faster training. Both language and reconstruction losses remain active."}
+    ][this.state.archStep - 1];
+    return {
+      archStep:this.state.archStep,archTitle:architecture.title,archDescription:architecture.description,
+      summarySelected:this.state.archStep===1,decodingSelected:this.state.archStep===2,teacherSelected:this.state.archStep===3,
+      onSummary:()=>this.setState({archStep:1}),onDecoding:()=>this.setState({archStep:2}),onTeacher:()=>this.setState({archStep:3}),
+      bars,
+      mIndex:this.state.mIndex,mLabel:m.label,mSqa:m.sqa,mSpar:m.spar,mNote:m.note,onM:e=>this.setState({mIndex:Number(e.target.value)}),
+      layerIndex:this.state.layerIndex,lLabel:l.label,lSqa:l.sqa,lSpar:l.spar,lNote:l.note,onLayer:e=>this.setState({layerIndex:Number(e.target.value)}),
+      wipe:this.state.wipe,wipePct:this.state.wipe+"%",wipeClip:"inset(0 0 0 "+this.state.wipe+"%)",onWipe:e=>this.setState({wipe:Number(e.target.value)}),
+      pcaWipe:this.state.pcaWipe,pcaWipePct:this.state.pcaWipe+"%",pcaWipeClip:"inset(0 0 0 "+this.state.pcaWipe+"%)",onPcaWipe:e=>this.setState({pcaWipe:Number(e.target.value)}),
+      figureSrc:this.state.figureSrc,figureTitle:this.state.figureTitle,figureAlt:this.state.figureAlt,
+      onEnlargeObjects:()=>this.openFigure("assets/object-groups.png","Gaussian summary tokens learn object-level grouping","Gaussians decoded from a selected k-means cluster of summary tokens capture the sofa across viewpoints."),
+      onEnlargeCorrespondence:()=>this.openFigure("assets/correspondence.png","Improved feature representation without direct supervision","Feature correspondences and PCA visualizations comparing the baseline and Imagine3D-LLM."),
+      onEnlargeAttention:()=>this.openFigure("assets/correspondence.png","Image-to-image attention and feature PCA","Left: attention to the red query point. Right: PCA feature visualizations. Input views, baseline and Imagine3D-LLM from top to bottom."),
+      onEnlargePca:()=>this.openFigure("assets/correspondence.png","Image-to-image attention and feature PCA","Right: PCA feature visualizations. Left: attention to the red query point. Input views, baseline and Imagine3D-LLM from top to bottom."),
+      onEnlargeReconstructions:()=>this.openFigure("assets/reconstructions.png","Gaussian reconstructions","Room views and their predicted 3D Gaussian reconstructions."),
+      onCloseFigure:()=>this.closeFigure(),
+      onFigureBackdrop:e=>{if(e.target===e.currentTarget)this.closeFigure();},
+      onFigureClosed:()=>this.restoreFigureFocus()
+    };
+  }
+}
+</script>
+</body>
+</html>
