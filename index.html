@@ -242,10 +242,64 @@
     <div class="section-head"><div><p class="eyebrow">Inside the model</p><h2 id="analysis-title">Learning to reconstruct connects the views.</h2><p class="section-intro">The reconstruction objective encourages cross-view correspondence and object-level grouping within the model’s visual features.</p></div></div>
     <div class="two-col analysis-grid">
       <article class="analysis-item"><h3>Gaussian summary tokens learn object-level grouping</h3><div class="analysis-copy"><p>We apply k-means to the Gaussian summary tokens after training, then render the Gaussians decoded from a selected cluster.</p><details class="analysis-details" id="analysis-details-1"><summary><span class="details-read">Read details</span><span class="details-hide">Hide details</span></summary><p>Across the input views, this cluster captures the sofa, despite receiving no object labels or clustering supervision. The visualization suggests that compact summary tokens bring recurring scene content together into an object-level representation, instead of treating each view independently.</p></details></div><figure class="figure-panel figure-zoomable"><img src="assets/object-groups-1280.webp" sc-camel-src-set="assets/object-groups-640.webp 640w, assets/object-groups-1280.webp 1280w, assets/object-groups-1920.webp 1920w" sizes="(max-width: 680px) calc(100vw - 64px), (max-width: 1248px) 44vw, 500px" width="4198" height="1125" loading="lazy" alt="Input views and Gaussians decoded from a selected k-means cluster of summary tokens, showing the same sofa across views."><button class="figure-enlarge" type="button" onclick="{{ onEnlargeObjects }}" aria-label="Enlarge object-level grouping figure" aria-haspopup="dialog"><span aria-hidden="true">⤢</span> Enlarge</button></figure></article>
-      <article class="analysis-item"><h3>Improved feature representation without direct supervision</h3><div class="analysis-copy"><p>Only the Gaussian summary tokens receive direct 3D reconstruction supervision, yet the image features improve too.</p><details class="analysis-details" id="analysis-details-2"><summary><span class="details-read">Read details</span><span class="details-hide">Hide details</span></summary><p>On the left, the red point is the query: our attention weights concentrate more sharply on the corresponding object in other views. On the right, PCA maps image features to RGB, revealing more consistent, semantically structured regions than the baseline.</p></details></div><figure class="figure-panel figure-zoomable"><img src="assets/correspondence-1280.webp" sc-camel-src-set="assets/correspondence-640.webp 640w, assets/correspondence-1280.webp 1280w, assets/correspondence-1920.webp 1920w" sizes="(max-width: 680px) calc(100vw - 64px), (max-width: 1248px) 44vw, 500px" width="4648" height="1842" loading="lazy" alt="Cross-view feature correspondences and PCA visualizations comparing the baseline and Imagine3D-LLM."><button class="figure-enlarge" type="button" onclick="{{ onEnlargeCorrespondence }}" aria-label="Enlarge cross-view correspondence figure" aria-haspopup="dialog"><span aria-hidden="true">⤢</span> Enlarge</button></figure></article>
+      <article class="analysis-item"><h3>Improved feature representation without direct supervision</h3><div class="analysis-copy"><p>Only the Gaussian summary tokens receive direct 3D reconstruction supervision, yet the image features improve too.</p><details class="analysis-details" id="analysis-details-2"><summary><span class="details-read">Read details</span><span class="details-hide">Hide details</span></summary><p>On the left, the red point is the query: our attention weights concentrate more sharply on the corresponding object in other views. On the right, PCA maps image features to RGB, revealing more consistent, semantically structured regions than the baseline.</p></details></div><figure class="figure-panel figure-zoomable"><img src="assets/correspondence-1280.webp" sc-camel-src-set="assets/correspondence-640.webp 640w, assets/correspondence-1280.webp 1280w, assets/correspondence-1920.webp 1920w" sizes="(max-width: 680px) calc(100vw - 64px), (max-width: 1248px) 44vw, 500px" width="3185" height="1261" loading="lazy" alt="Cross-view feature correspondences and PCA visualizations comparing the baseline and Imagine3D-LLM."><button class="figure-enlarge" type="button" onclick="{{ onEnlargeCorrespondence }}" aria-label="Enlarge cross-view correspondence figure" aria-haspopup="dialog"><span aria-hidden="true">⤢</span> Enlarge</button></figure></article>
     </div>
-    <details class="details" id="attention-comparison"><summary>Compare image-to-image feature attention interactively</summary><div class="details-body"><div class="comparison-wrap attention-comparison"><div class="comparison-visual"><p class="note">Input views</p><div class="comparison-image comparison-input" role="img" aria-label="Four input views of the same scene"></div><div class="comparison" role="img" aria-label="Image-to-image attention comparison: baseline at left, Imagine3D-LLM at right"><div class="comparison-image baseline"></div><div class="comparison-image ours" style="clip-path: {{ wipeClip }};"></div><div class="wipe-line" style="left: {{ wipePct }};"></div></div><button class="figure-enlarge" type="button" onclick="{{ onEnlargeAttention }}" aria-label="Enlarge the full attention and PCA figure" aria-haspopup="dialog"><span aria-hidden="true">⤢</span> Enlarge</button></div><div class="compare-controls"><label for="attention-wipe"><span>Baseline</span><span>Imagine3D-LLM</span></label><input id="attention-wipe" type="range" min="0" max="100" value="{{ wipe }}" onchange="{{ onWipe }}" aria-label="Image-to-image attention comparison divider" aria-valuetext="{{ wipe }} percent baseline visible"></div><p class="note">The red point marks the query location. Drag the divider to compare attention to that query across views. Warmer colours indicate higher attention weights; sharper focus on the corresponding object indicates stronger cross-view correspondence.</p></div></div></details>
-    <details class="details" id="pca-comparison"><summary>Compare feature PCA interactively</summary><div class="details-body"><div class="comparison-wrap pca-comparison"><div class="comparison-visual"><p class="note">Input views</p><div class="comparison-image comparison-input" role="img" aria-label="Four input views of the same scene"></div><div class="comparison" role="img" aria-label="PCA feature comparison: baseline at left, Imagine3D-LLM at right"><div class="comparison-image baseline"></div><div class="comparison-image ours" style="clip-path: {{ pcaWipeClip }};"></div><div class="wipe-line" style="left: {{ pcaWipePct }};"></div></div><button class="figure-enlarge" type="button" onclick="{{ onEnlargePca }}" aria-label="Enlarge the full attention and PCA figure" aria-haspopup="dialog"><span aria-hidden="true">⤢</span> Enlarge</button></div><div class="compare-controls"><label for="pca-wipe"><span>Baseline</span><span>Imagine3D-LLM</span></label><input id="pca-wipe" type="range" min="0" max="100" value="{{ pcaWipe }}" onchange="{{ onPcaWipe }}" aria-label="PCA feature comparison divider" aria-valuetext="{{ pcaWipe }} percent baseline visible"></div><p class="note">Drag the divider to compare image-feature structure. PCA maps the first three principal components to RGB. Within each model, similar colours indicate similar feature representations, not assigned object labels.</p></div></div></details>
+    <details class="details" id="attention-comparison" sc-camel-on-toggle="{{ onAttentionToggle }}">
+      <summary>Compare image-to-image feature attention interactively</summary>
+      <div class="details-body"><div class="comparison-wrap attention-comparison">
+        <div class="comparison-visual">
+          <p class="note">Input views</p>
+          <div class="comparison-image comparison-input" role="img" aria-label="Four input views of the same scene"></div>
+          <div class="comparison-labels" aria-hidden="true">
+            <span>Baseline <small>{{ wipe }}% visible</small></span>
+            <span>Imagine3D-LLM <small>{{ wipeOurs }}% visible</small></span>
+          </div>
+          <div class="comparison" role="group" aria-label="Image-to-image attention comparison: baseline at left, Imagine3D-LLM at right" onpointerdown="{{ onAttentionDown }}" onpointermove="{{ onAttentionMove }}" onpointerup="{{ onCompareEnd }}" onpointercancel="{{ onCompareEnd }}">
+            <div class="comparison-image baseline" aria-hidden="true"></div>
+            <div class="comparison-image ours" style="clip-path: {{ wipeClip }};" aria-hidden="true"></div>
+            <div class="wipe-line" style="left: {{ wipePct }};" aria-hidden="true"></div>
+            <button class="wipe-handle" type="button" role="slider" aria-label="Image-to-image attention comparison divider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ wipe }}" aria-valuetext="{{ wipeValueText }}" aria-orientation="horizontal" aria-describedby="attention-instructions" style="left: clamp(22px, {{ wipePct }}, calc(100% - 22px));" onkeydown="{{ onAttentionKey }}" onfocus="{{ onAttentionFocus }}"><span aria-hidden="true">↔</span></button>
+            <span class="comparison-hint" data-visible="{{ wipeHint }}" data-side="{{ wipeHintSide }}" style="--divider-position: {{ wipePct }};" aria-hidden="true">Drag<span class="comparison-hint-long"> ↔ to compare</span></span>
+          </div>
+          <button class="figure-enlarge" type="button" onclick="{{ onEnlargeAttention }}" aria-label="Enlarge the full attention and PCA figure" aria-haspopup="dialog"><span aria-hidden="true">⤢</span> Enlarge</button>
+        </div>
+        <div class="compare-controls" role="group" aria-label="Image-to-image attention comparison views">
+          <button type="button" onclick="{{ onAttentionBaseline }}" aria-pressed="{{ wipeBaselineOnly }}">Baseline only</button>
+          <button type="button" onclick="{{ onAttentionSplit }}" aria-pressed="{{ wipeSplit }}">Split view</button>
+          <button type="button" onclick="{{ onAttentionOurs }}" aria-pressed="{{ wipeOursOnly }}" aria-label="Ours only — Imagine3D-LLM">Ours only</button>
+        </div>
+        <p class="comparison-instructions" id="attention-instructions">Drag the divider or use the arrow keys. Move left to reveal more Imagine3D-LLM; move right for more Baseline.</p>
+        <p class="note">The red point marks the query location. Warmer colours indicate higher attention weights; sharper focus on the corresponding object indicates stronger cross-view correspondence.</p>
+      </div></div>
+    </details>
+    <details class="details" id="pca-comparison" sc-camel-on-toggle="{{ onPcaToggle }}">
+      <summary>Compare feature PCA interactively</summary>
+      <div class="details-body"><div class="comparison-wrap pca-comparison">
+        <div class="comparison-visual">
+          <p class="note">Input views</p>
+          <div class="comparison-image comparison-input" role="img" aria-label="Four input views of the same scene"></div>
+          <div class="comparison-labels" aria-hidden="true">
+            <span>Baseline <small>{{ pcaWipe }}% visible</small></span>
+            <span>Imagine3D-LLM <small>{{ pcaWipeOurs }}% visible</small></span>
+          </div>
+          <div class="comparison" role="group" aria-label="PCA feature comparison: baseline at left, Imagine3D-LLM at right" onpointerdown="{{ onPcaDown }}" onpointermove="{{ onPcaMove }}" onpointerup="{{ onCompareEnd }}" onpointercancel="{{ onCompareEnd }}">
+            <div class="comparison-image baseline" aria-hidden="true"></div>
+            <div class="comparison-image ours" style="clip-path: {{ pcaWipeClip }};" aria-hidden="true"></div>
+            <div class="wipe-line" style="left: {{ pcaWipePct }};" aria-hidden="true"></div>
+            <button class="wipe-handle" type="button" role="slider" aria-label="PCA feature comparison divider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ pcaWipe }}" aria-valuetext="{{ pcaWipeValueText }}" aria-orientation="horizontal" aria-describedby="pca-instructions" style="left: clamp(22px, {{ pcaWipePct }}, calc(100% - 22px));" onkeydown="{{ onPcaKey }}" onfocus="{{ onPcaFocus }}"><span aria-hidden="true">↔</span></button>
+            <span class="comparison-hint" data-visible="{{ pcaWipeHint }}" data-side="{{ pcaWipeHintSide }}" style="--divider-position: {{ pcaWipePct }};" aria-hidden="true">Drag<span class="comparison-hint-long"> ↔ to compare</span></span>
+          </div>
+          <button class="figure-enlarge" type="button" onclick="{{ onEnlargePca }}" aria-label="Enlarge the full attention and PCA figure" aria-haspopup="dialog"><span aria-hidden="true">⤢</span> Enlarge</button>
+        </div>
+        <div class="compare-controls" role="group" aria-label="PCA feature comparison views">
+          <button type="button" onclick="{{ onPcaBaseline }}" aria-pressed="{{ pcaWipeBaselineOnly }}">Baseline only</button>
+          <button type="button" onclick="{{ onPcaSplit }}" aria-pressed="{{ pcaWipeSplit }}">Split view</button>
+          <button type="button" onclick="{{ onPcaOurs }}" aria-pressed="{{ pcaWipeOursOnly }}" aria-label="Ours only — Imagine3D-LLM">Ours only</button>
+        </div>
+        <p class="comparison-instructions" id="pca-instructions">Drag the divider or use the arrow keys. Move left to reveal more Imagine3D-LLM; move right for more Baseline.</p>
+        <p class="note">PCA maps the first three principal components to RGB. Within each model, similar colours indicate similar feature representations, not assigned object labels.</p>
+      </div></div>
+    </details>
     <details class="details"><summary>See Gaussian reconstruction</summary><div class="details-body"><p>The learned representation captures coarse scene geometry and object layout. It is intended to support spatial reasoning rather than photorealistic rendering.</p><figure class="figure-panel figure-zoomable subsection"><img src="assets/reconstructions-1280.webp" sc-camel-src-set="assets/reconstructions-640.webp 640w, assets/reconstructions-1280.webp 1280w, assets/reconstructions-1920.webp 1920w" sizes="(max-width: 1248px) calc(100vw - 80px), 1150px" width="3837" height="1292" loading="lazy" alt="Additional input room views and their predicted 3D Gaussian reconstructions."><button class="figure-enlarge" type="button" onclick="{{ onEnlargeReconstructions }}" aria-label="Enlarge Gaussian reconstructions" aria-haspopup="dialog"><span aria-hidden="true">⤢</span> Enlarge</button></figure></div></details>
   </section>
 
@@ -260,7 +314,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { mIndex: 1, layerIndex: 1, wipe: 50, pcaWipe: 50, archStep: 3, figureSrc: "assets/object-groups-1280.webp", figureTitle: "Gaussian summary tokens learn object-level grouping", figureAlt: "Object-level grouping across views" };
+  state = { mIndex: 1, layerIndex: 1, wipe: 50, pcaWipe: 50, wipeHint: false, pcaWipeHint: false, archStep: 3, figureSrc: "assets/object-groups-1280.webp", figureTitle: "Gaussian summary tokens learn object-level grouping", figureAlt: "Object-level grouping across views" };
   componentDidMount() {
     this._motivationFrame = requestAnimationFrame(() => {
       const video = document.getElementById("motivation-video");
@@ -281,6 +335,7 @@ class Component extends DCLogic {
   componentWillUnmount() {
     cancelAnimationFrame(this._motivationFrame);
     if (this._motivationObserver) this._motivationObserver.disconnect();
+    Object.values(this._compareHintTimers || {}).forEach(clearTimeout);
     this.restoreFigureFocus();
   }
   openFigure(src, title, alt) {
@@ -304,6 +359,70 @@ class Component extends DCLogic {
     }
     if (this._figureTrigger && this._figureTrigger.isConnected) this._figureTrigger.focus({ preventScroll: true });
     this._figureTrigger = null;
+  }
+  showCompareHint(key) {
+    this._compareHintTimers = this._compareHintTimers || {};
+    clearTimeout(this._compareHintTimers[key]);
+    this.setState({ [key + "Hint"]: true });
+    this._compareHintTimers[key] = setTimeout(() => this.setState({ [key + "Hint"]: false }), 4000);
+  }
+  setComparison(key, value) {
+    clearTimeout((this._compareHintTimers || {})[key]);
+    this.setState({ [key]: Math.max(0, Math.min(100, Math.round(value))), [key + "Hint"]: false });
+  }
+  comparePointer(key, event, starting) {
+    const region = event.currentTarget;
+    if (starting) {
+      if (!event.isPrimary || event.button !== 0) return;
+      region.querySelector('[role="slider"]').focus({ preventScroll: true });
+      this._compareDrag = { key, id: event.pointerId, x: event.clientX, y: event.clientY, value: this.state[key], handle: !!event.target.closest('.wipe-handle'), moved: false };
+      region.setPointerCapture(event.pointerId);
+      return;
+    }
+    const drag = this._compareDrag;
+    if (!drag || drag.id !== event.pointerId || !region.hasPointerCapture(event.pointerId)) return;
+    const dx = event.clientX - drag.x, dy = event.clientY - drag.y;
+    // Preserve vertical touch scrolling and the grab position at either edge.
+    if (!drag.moved && (Math.abs(dx) < 4 || Math.abs(dx) <= Math.abs(dy))) return;
+    drag.moved = true;
+    const bounds = region.getBoundingClientRect();
+    this.setComparison(key, drag.handle ? drag.value + dx / bounds.width * 100 : (event.clientX - bounds.left) / bounds.width * 100);
+  }
+  compareEnd(event) {
+    const region = event.currentTarget, drag = this._compareDrag;
+    if (!drag || drag.id !== event.pointerId) return;
+    if (event.type === "pointerup" && !drag.moved && !drag.handle && Math.abs(event.clientX - drag.x) < 4 && Math.abs(event.clientY - drag.y) < 4) {
+      const bounds = region.getBoundingClientRect();
+      this.setComparison(drag.key, (event.clientX - bounds.left) / bounds.width * 100);
+    }
+    this._compareDrag = null;
+    if (region.hasPointerCapture(event.pointerId)) region.releasePointerCapture(event.pointerId);
+  }
+  compareKey(key, event) {
+    const current = this.state[key];
+    const step = event.shiftKey ? 10 : 1;
+    const values = { ArrowLeft: current - step, ArrowDown: current - step, ArrowRight: current + step, ArrowUp: current + step, Home: 0, End: 100 };
+    if (!(event.key in values)) return;
+    event.preventDefault();
+    this.setComparison(key, values[event.key]);
+  }
+  comparisonBindings(key, name) {
+    const value = this.state[key];
+    return {
+      [key]: value, [key + "Ours"]: 100 - value, [key + "Pct"]: value + "%",
+      [key + "Clip"]: "inset(0 0 0 " + value + "%)",
+      [key + "ValueText"]: "Baseline " + value + " percent visible; Imagine3D-LLM " + (100 - value) + " percent visible",
+      [key + "Hint"]: this.state[key + "Hint"], [key + "HintSide"]: value <= 50 ? "right" : "left",
+      [key + "BaselineOnly"]: value === 100, [key + "Split"]: value === 50, [key + "OursOnly"]: value === 0,
+      ["on" + name + "Toggle"]: e => { if (e.currentTarget.open) this.showCompareHint(key); },
+      ["on" + name + "Focus"]: () => this.showCompareHint(key),
+      ["on" + name + "Down"]: e => this.comparePointer(key, e, true),
+      ["on" + name + "Move"]: e => this.comparePointer(key, e, false),
+      ["on" + name + "Key"]: e => this.compareKey(key, e),
+      ["on" + name + "Baseline"]: () => this.setComparison(key, 100),
+      ["on" + name + "Split"]: () => this.setComparison(key, 50),
+      ["on" + name + "Ours"]: () => this.setComparison(key, 0)
+    };
   }
   renderVals() {
     const ms = [
@@ -335,8 +454,9 @@ class Component extends DCLogic {
       bars,
       mIndex:this.state.mIndex,mLabel:m.label,mSqa:m.sqa,mSpar:m.spar,mNote:m.note,onM:e=>this.setState({mIndex:Number(e.target.value)}),
       layerIndex:this.state.layerIndex,lLabel:l.label,lSqa:l.sqa,lSpar:l.spar,lNote:l.note,onLayer:e=>this.setState({layerIndex:Number(e.target.value)}),
-      wipe:this.state.wipe,wipePct:this.state.wipe+"%",wipeClip:"inset(0 0 0 "+this.state.wipe+"%)",onWipe:e=>this.setState({wipe:Number(e.target.value)}),
-      pcaWipe:this.state.pcaWipe,pcaWipePct:this.state.pcaWipe+"%",pcaWipeClip:"inset(0 0 0 "+this.state.pcaWipe+"%)",onPcaWipe:e=>this.setState({pcaWipe:Number(e.target.value)}),
+      ...this.comparisonBindings("wipe", "Attention"),
+      ...this.comparisonBindings("pcaWipe", "Pca"),
+      onCompareEnd:e=>this.compareEnd(e),
       figureSrc:this.state.figureSrc,figureTitle:this.state.figureTitle,figureAlt:this.state.figureAlt,
       onEnlargeObjects:()=>this.openFigure("assets/object-groups.png","Gaussian summary tokens learn object-level grouping","Gaussians decoded from a selected k-means cluster of summary tokens capture the sofa across viewpoints."),
       onEnlargeCorrespondence:()=>this.openFigure("assets/correspondence.png","Improved feature representation without direct supervision","Feature correspondences and PCA visualizations comparing the baseline and Imagine3D-LLM."),
